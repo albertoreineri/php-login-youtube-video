@@ -1,45 +1,40 @@
-<?php 
+<?php
+//Config File
+include("config.php");
 
-/*-------------------------------
-CONNESSIONE PDO
---------------------------------*/
-//PDO Connection
-$servername="localhost";
-$username="root";
-$passworddb="root";
-$dbname="local";
-
-try{
-    $db = new PDO("mysql:=$servername;dbname=$dbname", $username, $passworddb);
-    $db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
-}catch(PDOException $e){
-    print "Errore!: ". $e->getMessage() . "<br>";
-    die();
-}
-
-
-/*-------------------------------
-LOGIN
---------------------------------*/
-$email=$_POST['email'];
-$password=$_POST['password'];
+/*------------------------------------------------------
+                    LOGIN
+-------------------------------------------------------*/
+///$_Post variables
+$email = $_POST['email'];
+$password = $_POST['password'];
 
 //Query
-$q = $db->prepare("SELECT * FROM utenti WHERE email = '$email'");
-$q->execute();
+$q = $dbh->prepare("SELECT * FROM users WHERE email = :email OR username =:email");
+$q->bindParam(':email', $email);
+$q->execute(); // eseguo la query
 $q->setFetchMode(PDO::FETCH_ASSOC);
 $rows = $q->rowCount();
-if($rows>0){
-    while($row=$q->fetch()){
-        if($row['password']===$password){
-            session_start();
-            $_SESSION['id'] = $row['id'];
-            header("location: ../welcome.php");
-        }else{
-            header("location: ../error.php");
-        }
-    }
-}else{
-    echo "Utente non presente in archvio";
+if ($rows > 0) {
+    while ($row = $q->fetch()) {
 
+        //Password control
+        if (!(password_verify($password, $row["password"]))) {
+            header("location: ../error.php?error=Wrong Password");
+            die();
+        }
+
+        //Start Session
+        session_start();
+
+        //Save user id in session
+        $_SESSION['id'] = $row["id"];
+
+        //Redirect to backend homepage
+        header("location: ../welcome.php");
+        die();
+    }
+} else {
+    header("location: ../error.php?error=Wrong Email or Username");
+    die();
 }

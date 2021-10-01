@@ -1,19 +1,16 @@
-<?php 
-session_start();
-$sessionid= $_SESSION['id'];
-if($sessionid==""){
-    header('location: error.php');
-}
+<?php
+define("PAGE", "Welcome");
+include("layouts/header.php");
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
-</head>
-<body>
-    <h1>Login avvenuto con successo</h1>
-</body>
-</html>
+
+<div class="container">
+    <div class="box welcome">
+
+        <h1>Login successful</h1>
+
+    </div>
+</div>
+
+<?php
+include("layouts/footer.php");
+?>
